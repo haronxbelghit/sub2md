@@ -1,0 +1,6 @@
+aiohttp>=3.8.0
+beautifulsoup4>=4.9.3
+tqdm>=4.65.0
+orjson>=3.8.0
+html2text>=2020.1.16
+markdown>=3.4.0 
