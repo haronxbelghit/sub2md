@@ -136,11 +136,23 @@ class SubstackScraper:
     def _extract_main_part(url: str) -> str:
         """Extract the main part of the domain from a URL."""
         try:
-            parts = urlparse(url).netloc.split('.')
-            if not parts:
+            netloc = urlparse(url).hostname
+            if not netloc:
                 raise ValidationError("Invalid URL format")
-            middle_index = len(parts) // 2
-            return parts[middle_index]
+            parts = netloc.split('.')
+
+            # For Substack domains like `https://example.substack.com` the
+            # writer name is the segment before `substack.com`.
+            if len(parts) >= 3 and parts[-2:] == ["substack", "com"]:
+                return parts[-3]
+
+            # For custom domains we assume the writer name is the second to last
+            # segment, e.g. `blog.example.com` -> "example" or `example.com` ->
+            # "example".
+            if len(parts) >= 2:
+                return parts[-2]
+
+            raise ValidationError("Invalid URL format")
         except Exception as e:
             raise ValidationError(f"Failed to extract main part from URL: {str(e)}")
 
